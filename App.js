@@ -1,20 +1,76 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { View,StyleSheet, FlatList, Text, TouchableOpacity , Alert , TouchableWithoutFeedback, Keyboard} from 'react-native';
+import Header from './components/header';
+import AddTodo from './components/addTodo';
+import TodoItem from './components/todoItem';
 
 export default function App() {
+  
+  const [todos, setTodos] = useState([
+    { text: 'buy coffee', key: '1' },
+    { text: 'create an app', key: '2' },
+    { text: 'play on the switch', key: '3' }
+  ]);
+
+  const pressHandler = (key) =>{
+    setTodos((prevTodos) => {
+      return prevTodos.filter(todo => todo.key != key)
+    })
+  }
+  const submitTodo = (text) => {
+    if(text.length > 3 ){
+      setTodos((prevTodos) => {
+        return [
+          {text: text , key:Math.random().toString()},
+          ...prevTodos
+        ]
+      })
+    } else{
+      Alert.alert('OOPS!', 'Todos must be more than 3 chars long',[
+        {text: 'understood' , onPress: ()=> console.log('alert closed')}
+      ])
+    }
+  
+  }
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+
+    <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss();}}>
+      <View style={styles.container}>
+     {/* header */}
+     <Header/>
+      <View style={styles.form} >
+        
+        <View style={styles.list}>
+          {/* Flat list */}
+          <FlatList
+          data={todos}
+          renderItem={({item}) => (
+            <TodoItem item={item} pressHandler= {pressHandler}/>
+          )}>
+          </FlatList>
+          {/* FOrm */}
+          <AddTodo submitTodo={submitTodo}></AddTodo>
+        </View>
+      </View>
     </View>
+    </TouchableWithoutFeedback>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: '#FFDD44',
+    // alignItems: 'center',
+    // justifyContent: 'center',
+    paddingTop: 40,
+    paddingHorizontal: 20
   },
+  content:{
+    padding:40,
+  },
+  list:{
+    marginTop:20,
+    height:'80%'
+  }
 });
